@@ -1,0 +1,17 @@
+repository:
+revision:
+overrides:
+  clusterRepository:
+  clusterRevision:
+  groupsRepository:
+  groupsRevision:
+  projectsRepository:
+  projectsRevision:
+
+cluster:
+  name:
+  groups: []
+
+groups:
+
+projects:

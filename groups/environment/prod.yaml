@@ -1,0 +1,5 @@
+groups:
+  environment/prod:
+    projects:
+    - project-a
+

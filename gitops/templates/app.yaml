@@ -1,0 +1,62 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitops
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  
+  sources:
+    - repoURL: {{ .Values.repository }}
+      targetRevision: {{ .Values.revision }}
+      path: gitops
+      helm:
+        parameters:
+          - name: repository
+            value: {{ .Values.repository }}
+          - name: revision
+            value: {{ .Values.revision }}
+          - name: overrides.clusterRepository
+            value: {{ .Values.overrides.clusterRepository | quote }}
+          - name: overrides.clusterRevision
+            value: {{ .Values.overrides.clusterRevision | quote }}
+          - name: overrides.groupsRepository
+            value: {{ .Values.overrides.groupsRepository | quote }}
+          - name: overrides.groupsRevision
+            value: {{ .Values.overrides.groupsRevision | quote }}
+          - name: overrides.projectsRepository
+            value: {{ .Values.overrides.projectsRepository | quote }}
+          - name: overrides.projectsRevision
+            value: {{ .Values.overrides.projectsRevision | quote }}
+        valueFiles:
+        - $clusters/clusters/{{ .Values.cluster.name }}.yaml
+        {{ range .Values.cluster.groups -}}
+        - $groups/groups/{{ . }}.yaml
+        {{- end }}
+        {{ range $_, $group := $.Values.groups -}}
+        {{ range $group.projects }}
+        - $projects/projects/{{ . }}.yaml
+        {{- end }}
+        {{- end }}
+        
+        ignoreMissingValueFiles: false
+    - repoURL: {{ default .Values.repository .Values.overrides.clusterRepository }}
+      targetRevision: {{ default .Values.revision .Values.overrides.clusterRevision }}
+      ref: clusters
+    - repoURL: {{ default .Values.repository .Values.overrides.groupsRepository }}
+      targetRevision: {{ default .Values.revision .Values.overrides.groupsRevision }}
+      ref: groups
+    - repoURL: {{ default .Values.repository .Values.overrides.projectsRepository }}
+      targetRevision: {{ default .Values.revision .Values.overrides.projectsRevision }}
+      ref: projects
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+      
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
