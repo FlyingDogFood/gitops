@@ -19,6 +19,7 @@ spec:
           gitops:
             {{- toYaml .Values.gitops | nindent 12 }}
         valueFiles:
+        {{- include "gitops.appsPaths" . | indent 8 }}
         {{- include "gitops.projectsPaths" . | indent 8 }}
         {{- range .Values.cluster.groups }}
         - $groups/{{ $.Values.gitops.groups.path }}/{{ . }}.yaml
@@ -35,6 +36,9 @@ spec:
     - repoURL: {{ default .Values.gitops.repository .Values.gitops.projects.repository }}
       targetRevision: {{ default .Values.gitops.revision .Values.gitops.projects.revision }}
       ref: projects
+    - repoURL: {{ default .Values.gitops.repository .Values.gitops.apps.repository }}
+      targetRevision: {{ default .Values.gitops.revision .Values.gitops.apps.revision }}
+      ref: apps
 
   destination:
     server: https://kubernetes.default.svc
@@ -54,5 +58,19 @@ spec:
 {{ end -}}
 {{- range $projectList }}
 - $projects/{{ $.Values.gitops.projects.path }}/{{ . }}.yaml
+{{- end }}
+{{- end }}
+
+{{ define "gitops.appsPaths" -}}
+{{ $appList := list -}}
+{{ range $_, $group := $.Values.groups -}}
+{{ range $group.apps -}}
+{{ if not (has . $appList) -}}
+{{ $appList = append $appList . -}}
+{{ end -}}
+{{ end -}}
+{{ end -}}
+{{- range $appList }}
+- $apps/{{ $.Values.gitops.apps.path }}/{{ . }}.yaml
 {{- end }}
 {{- end }}

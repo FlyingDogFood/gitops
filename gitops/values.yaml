@@ -19,6 +19,10 @@ gitops:
     path: projects
     repository:
     revision:
+  apps:
+    path: apps
+    repository:
+    revision:
   
 cluster:
   name:
@@ -27,3 +31,5 @@ cluster:
 groups:
 
 projects:
+
+apps:

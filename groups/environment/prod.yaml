@@ -2,4 +2,6 @@ groups:
   environment/prod:
     projects:
     - project-a
+    apps:
+    - app-a
 

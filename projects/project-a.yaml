@@ -1,3 +1,5 @@
 projects:
   project-a:
+    groups:
+      - environment/prod
     name: project-a

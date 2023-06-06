@@ -1,0 +1,4 @@
+{{ range $appKey, $app := .Values.apps -}}
+---
+{{ tpl $app.appTemplate $ }}
+{{ end -}}

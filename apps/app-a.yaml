@@ -1,0 +1,6 @@
+apps:
+  app-a:
+    groups:
+      - environment/prod
+    appTemplate: |
+      test: {{ include "gitops.appsPaths" . }}
