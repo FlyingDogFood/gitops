@@ -31,15 +31,15 @@ spec:
           - name: overrides.projectsRevision
             value: {{ .Values.overrides.projectsRevision | quote }}
         valueFiles:
-        - $clusters/clusters/{{ .Values.cluster.name }}.yaml
-        {{ range .Values.cluster.groups -}}
-        - $groups/groups/{{ . }}.yaml
-        {{- end }}
         {{ range $_, $group := $.Values.groups -}}
-        {{ range $group.projects }}
+        {{ range $group.projects -}}
         - $projects/projects/{{ . }}.yaml
         {{- end }}
         {{- end }}
+        {{ range .Values.cluster.groups -}}
+        - $groups/groups/{{ . }}.yaml
+        {{- end }}
+        - $clusters/clusters/{{ .Values.cluster.name }}.yaml
         
         ignoreMissingValueFiles: false
     - repoURL: {{ default .Values.repository .Values.overrides.clusterRepository }}
