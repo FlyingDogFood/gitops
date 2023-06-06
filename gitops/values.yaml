@@ -1,13 +1,25 @@
-repository:
-revision:
-overrides:
-  clusterRepository:
-  clusterRevision:
-  groupsRepository:
-  groupsRevision:
-  projectsRepository:
-  projectsRevision:
-
+gitops:
+  repository:
+  revision:
+  path: gitops
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+  clusters:
+    path: clusters
+    repository:
+    revision:
+  groups:
+    path: groups
+    repository:
+    revision:
+  projects:
+    path: projects
+    repository:
+    revision:
+  
 cluster:
   name:
   groups: []

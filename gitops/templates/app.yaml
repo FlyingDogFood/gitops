@@ -1,62 +1,58 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: gitops
-  namespace: argocd
+  name: {{ include "gitops.fullname" .}}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "gitops.labels" . | nindent 4 }}
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  project: default
+  project: {{ .Values.gitops.project }}
   
   sources:
-    - repoURL: {{ .Values.repository }}
-      targetRevision: {{ .Values.revision }}
-      path: gitops
+    - repoURL: {{ .Values.gitops.repository }}
+      targetRevision: {{ .Values.gitops.revision }}
+      path: {{ .Values.gitops.path }}
       helm:
-        parameters:
-          - name: repository
-            value: {{ .Values.repository }}
-          - name: revision
-            value: {{ .Values.revision }}
-          - name: overrides.clusterRepository
-            value: {{ .Values.overrides.clusterRepository | quote }}
-          - name: overrides.clusterRevision
-            value: {{ .Values.overrides.clusterRevision | quote }}
-          - name: overrides.groupsRepository
-            value: {{ .Values.overrides.groupsRepository | quote }}
-          - name: overrides.groupsRevision
-            value: {{ .Values.overrides.groupsRevision | quote }}
-          - name: overrides.projectsRepository
-            value: {{ .Values.overrides.projectsRepository | quote }}
-          - name: overrides.projectsRevision
-            value: {{ .Values.overrides.projectsRevision | quote }}
+        values: |
+          gitops:
+            {{- toYaml .Values.gitops | nindent 12 }}
         valueFiles:
-        {{ range $_, $group := $.Values.groups -}}
-        {{ range $group.projects -}}
-        - $projects/projects/{{ . }}.yaml
+        {{- include "gitops.projectsPaths" . | indent 8 }}
+        {{- range .Values.cluster.groups }}
+        - $groups/{{ $.Values.gitops.groups.path }}/{{ . }}.yaml
         {{- end }}
-        {{- end }}
-        {{ range .Values.cluster.groups -}}
-        - $groups/groups/{{ . }}.yaml
-        {{- end }}
-        - $clusters/clusters/{{ .Values.cluster.name }}.yaml
+        - $clusters/{{ .Values.gitops.clusters.path }}/{{ .Values.cluster.name }}.yaml
         
         ignoreMissingValueFiles: false
-    - repoURL: {{ default .Values.repository .Values.overrides.clusterRepository }}
-      targetRevision: {{ default .Values.revision .Values.overrides.clusterRevision }}
+    - repoURL: {{ default .Values.gitops.repository .Values.gitops.clusters.repository }}
+      targetRevision: {{ default .Values.gitops.revision .Values.gitops.clusters.revision }}
       ref: clusters
-    - repoURL: {{ default .Values.repository .Values.overrides.groupsRepository }}
-      targetRevision: {{ default .Values.revision .Values.overrides.groupsRevision }}
+    - repoURL: {{ default .Values.gitops.repository .Values.gitops.groups.repository }}
+      targetRevision: {{ default .Values.gitops.revision .Values.gitops.groups.revision }}
       ref: groups
-    - repoURL: {{ default .Values.repository .Values.overrides.projectsRepository }}
-      targetRevision: {{ default .Values.revision .Values.overrides.projectsRevision }}
+    - repoURL: {{ default .Values.gitops.repository .Values.gitops.projects.repository }}
+      targetRevision: {{ default .Values.gitops.revision .Values.gitops.projects.revision }}
       ref: projects
 
   destination:
     server: https://kubernetes.default.svc
-    namespace: argocd
+    namespace: {{ .Release.Namespace }}
       
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
+    {{- toYaml .Values.gitops.syncPolicy | nindent 4 }}
+
+{{ define "gitops.projectsPaths" -}}
+{{ $projectList := list -}}
+{{ range $_, $group := $.Values.groups -}}
+{{ range $group.projects -}}
+{{ if not (has . $projectList) -}}
+{{ $projectList = append $projectList . -}}
+{{ end -}}
+{{ end -}}
+{{ end -}}
+{{- range $projectList }}
+- $projects/{{ $.Values.gitops.projects.path }}/{{ . }}.yaml
+{{- end }}
+{{- end }}
