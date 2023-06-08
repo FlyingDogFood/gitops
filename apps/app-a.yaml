@@ -3,4 +3,14 @@ apps:
     groups:
       - environment/prod
     appTemplate: |
-      test: {{ include "gitops.appsPaths" . }}
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: app-a
+      spec:
+        containers:
+          - command:
+              - sleep
+              - "3600"
+            image: redhat/ubi8
+            name: app-a
