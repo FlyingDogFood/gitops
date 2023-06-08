@@ -13,5 +13,4 @@ helm install gitops gitops \
     --set gitops.apps.path="examples/simple/apps" \
     --set gitops.clusters.path="examples/simple/clusters" \
     --set gitops.groups.path="examples/simple/groups" \
-    --set cluster.name="<cluster-name>"
 ```
