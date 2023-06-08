@@ -1,0 +1,6 @@
+groups:
+  environment/prod:
+    apps:
+    - app-b
+
+sleepTime: 50

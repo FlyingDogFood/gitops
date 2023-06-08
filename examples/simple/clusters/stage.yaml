@@ -1,0 +1,5 @@
+cluster:
+  name: stage
+  groups:
+    - environment/stage
+    - cloud/example

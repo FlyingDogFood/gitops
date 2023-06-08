@@ -1,0 +1,6 @@
+groups:
+  environment/stage:
+    apps:
+    - app-b
+
+sleepTime: 100

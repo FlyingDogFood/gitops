@@ -1,0 +1,7 @@
+groups:
+  environment/dev:
+    apps:
+    - app-b
+    - app-c
+
+sleepTime: 200

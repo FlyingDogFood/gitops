@@ -1,0 +1,16 @@
+apps:
+  app-c:
+    groups:
+      - environment/dev
+    appTemplate: |
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: app-c
+      spec:
+        containers:
+          - command:
+              - sleep
+              - "3600"
+            image: {{ .Values.appImage }}
+            name: app-c

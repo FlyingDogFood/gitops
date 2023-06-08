@@ -1,0 +1,6 @@
+groups:
+  cloud/example:
+    apps:
+    - app-a
+
+appImage: redhat/ubi8

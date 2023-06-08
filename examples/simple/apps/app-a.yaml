@@ -1,0 +1,16 @@
+apps:
+  app-a:
+    groups:
+      - cloud/example
+    appTemplate: |
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: app-a
+      spec:
+        containers:
+          - command:
+              - sleep
+              - {{ .Values.sleepTime | quote }}
+            image: {{ .Values.appImage }}
+            name: app-a

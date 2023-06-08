@@ -1,0 +1,5 @@
+cluster:
+  name: prod
+  groups:
+    - environment/prod
+    - cloud/example

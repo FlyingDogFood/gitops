@@ -1,0 +1,18 @@
+apps:
+  app-b:
+    groups:
+      - environment/dev
+      - environment/stage
+      - environment/prod
+    appTemplate: |
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: app-b
+      spec:
+        containers:
+          - command:
+              - sleep
+              - "3600"
+            image: {{ .Values.appImage }}
+            name: app-b
