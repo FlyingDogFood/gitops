@@ -24,7 +24,9 @@ spec:
         {{- range .Values.cluster.groups }}
         - $groups/{{ $.Values.gitops.groups.path }}/{{ . }}.yaml
         {{- end }}
+        {{ if .Values.cluster.name -}}
         - $clusters/{{ .Values.gitops.clusters.path }}/{{ .Values.cluster.name }}.yaml
+        {{- end }}
         
         ignoreMissingValueFiles: false
     - repoURL: {{ default .Values.gitops.repository .Values.gitops.clusters.repository }}
